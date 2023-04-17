@@ -3,15 +3,15 @@ using TMPro;
 using UniRx;
 using UnityEngine;
 
-namespace Architecture.UI.Buttons
+namespace FZFUI.UI.Buttons
 {
-    public interface IText<T>
+    public interface IText
     {
         public void SetText(string text);
         public void SubscribeText(IObservable<string> property);
     }
     
-    public class TextButton: BasicButton, IText<object>
+    public class TextButton: BasicButton, IText
     {
         [SerializeField] private TextMeshProUGUI Label;
 

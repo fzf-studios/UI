@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine.Events;
 
-namespace Architecture.UI.Buttons
+namespace FZFUI.UI.Buttons
 {
     public interface ISubscribableButton
     {
