@@ -127,6 +127,11 @@ namespace {namespaceName}
         {
             string scriptName = Selection.activeObject.name;
             var filePath = $"Assets/Scripts/UI/{scriptName}.cs";
+            if (AssetDatabase.LoadAssetAtPath<MonoScript>(filePath) != null)
+            {
+                Debug.LogWarning($"Attempt to rewrite already existing class file!");
+                return;
+            }
 
             File.WriteAllText(filePath, $@"using FZFUI.UI.Autogen;
 
