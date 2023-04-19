@@ -1,16 +1,19 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using FZFUI.UI.Buttons;
 using Sirenix.OdinInspector;
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace FZFUI.UI.Autogen
 {
     public class BaseAutogen : MonoBehaviour
     {
+#if UNITY_EDITOR
         [ButtonGroup("Auto")]
         [Button("Generate", ButtonSizes.Medium)]
         private void GenerateFields()
@@ -52,8 +55,8 @@ namespace {namespaceName}
             foreach (var component in components)
             {
                 var type = component.GetType();
-                var usingName = !string.IsNullOrWhiteSpace(type.Namespace) 
-                    ? $"using {type.Namespace};" 
+                var usingName = !string.IsNullOrWhiteSpace(type.Namespace)
+                    ? $"using {type.Namespace};"
                     : "";
                 var fieldName = $"[SerializeField] private {type.Name} {namingPattern?.Invoke(component)};";
                 fields.Add(fieldName);
@@ -164,5 +167,6 @@ namespace UI
                 activeGameObject.AddComponent(script.GetClass());
             }
         }
+#endif
     }
 }
