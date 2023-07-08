@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FZFUI.UI.Buttons;
-using Sirenix.OdinInspector;
 using UnityEditor;
 #endif
+using NaughtyAttributes;
 using UnityEngine;
 
 namespace FZFUI.UI.Autogen
@@ -14,8 +14,7 @@ namespace FZFUI.UI.Autogen
     public class BaseAutogen : MonoBehaviour
     {
 #if UNITY_EDITOR
-        [ButtonGroup("Auto")]
-        [Button("Generate", ButtonSizes.Medium)]
+        [Button("Generate", EButtonEnableMode.Editor)]
         private void GenerateFields()
         {
             var concreteClass = GetConcreteClass();
@@ -94,9 +93,8 @@ namespace {namespaceName}
                     RecursivelyGetComponents(child, components);
             }
         }
-
-        [ButtonGroup("Auto")]
-        [Button("Assign", ButtonSizes.Medium)]
+        
+        [Button("Assign", EButtonEnableMode.Editor)]
         private void AssignFields()
         {
             var concreteClass = GetConcreteClass();
