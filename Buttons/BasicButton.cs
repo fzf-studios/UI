@@ -26,13 +26,12 @@ namespace FZFUI.UI.Buttons
             Button.interactable = interactable;
         }
 
-        public void SubscribeInteractable(IObservable<bool> property)
+        public IDisposable SubscribeInteractable(IObservable<bool> property)
         {
-            property.Subscribe(value => Button.interactable = value)
-                .AddTo(CompositeDisposable);
+            return property.Subscribe(value => Button.interactable = value);
         }
 
-        public IDisposable Subscribe(UnityAction action)
+        public IDisposable Subscribe(Action action)
         {
             return Button
                 .OnClickAsObservable()

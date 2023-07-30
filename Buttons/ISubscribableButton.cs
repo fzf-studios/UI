@@ -5,10 +5,10 @@ namespace FZFUI.UI.Buttons
 {
     public interface ISubscribableButton
     {
-        public IDisposable Subscribe(UnityAction action);
+        public IDisposable Subscribe(Action action);
         public void Unsubscribe(UnityAction action);
         public void SetInteractable(bool interactable);
-        public void SubscribeInteractable(IObservable<bool> property);
+        public IDisposable SubscribeInteractable(IObservable<bool> property);
         public void UnsubscribeAll();
     }
 }
