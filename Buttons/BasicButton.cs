@@ -28,14 +28,17 @@ namespace FZFUI.UI.Buttons
 
         public IDisposable SubscribeInteractable(IObservable<bool> property)
         {
-            return property.Subscribe(value => Button.interactable = value);
+            return property
+                .Subscribe(value => Button.interactable = value)
+                .AddTo(this);
         }
 
         public IDisposable Subscribe(Action action)
         {
             return Button
                 .OnClickAsObservable()
-                .Subscribe(_ => action?.Invoke());
+                .Subscribe(_ => action?.Invoke())
+                .AddTo(this);
         }
 
         public void Unsubscribe(UnityAction action)
