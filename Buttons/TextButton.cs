@@ -3,7 +3,7 @@ using TMPro;
 using UniRx;
 using UnityEngine;
 
-namespace FZFUI.UI.Buttons
+namespace FZFUI.Buttons
 {
     public interface IText
     {

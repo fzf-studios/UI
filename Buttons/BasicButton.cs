@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace FZFUI.UI.Buttons
+namespace FZFUI.Buttons
 {
     public class BasicButton : MonoBehaviour, ISubscribableButton
     {

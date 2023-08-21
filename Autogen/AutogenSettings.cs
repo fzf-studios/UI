@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FZFUI.UI.Autogen
+namespace FZFUI.Autogen
 {
     [CreateAssetMenu(fileName = "AutogenSettings", menuName = "Autogen/Create", order = 0)]
     public class AutogenSettings : ScriptableObject

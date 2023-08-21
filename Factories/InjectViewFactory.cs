@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Zenject;
 
-namespace Infrastructure.Factories
+namespace FZFUI.Factories
 {
     public interface IInjectViewFactory
     {

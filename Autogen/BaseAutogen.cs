@@ -1,20 +1,19 @@
-﻿#if UNITY_EDITOR
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FZFUI.UI.Buttons;
-using UnityEditor;
-#endif
+using FZFUI.Buttons;
 using NaughtyAttributes;
+using UnityEditor;
 using UnityEngine;
 
-namespace FZFUI.UI.Autogen
+namespace FZFUI.Autogen
 {
     public interface IView
     {
         public GameObject gameObject { get; }
     }
+
     public class BaseAutogen : MonoBehaviour, IView
     {
 #if UNITY_EDITOR
@@ -114,7 +113,7 @@ namespace {namespaceName}
                     RecursivelyGetComponents(child, components);
             }
         }
-        
+
         [Button("Assign", EButtonEnableMode.Editor)]
         private void AssignFields()
         {

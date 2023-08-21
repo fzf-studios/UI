@@ -1,8 +1,7 @@
-using FZFUI.UI.Buttons;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UI
+namespace FZFUI.Buttons
 {
     public interface IIcon
     {

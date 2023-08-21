@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 
-namespace FZFUI.UI.Extensions
+namespace FZFUI.Extensions
 {
     public static class TextMeshProExtensions
     {
