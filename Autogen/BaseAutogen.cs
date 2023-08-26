@@ -155,7 +155,8 @@ namespace {namespaceName}
                 return;
             }
 
-            File.WriteAllText(filePath, $@"using FZFUI.UI.Autogen;
+            var baseAutogenType = typeof(BaseAutogen);
+            File.WriteAllText(filePath, $@"using {baseAutogenType.Namespace};
 
 namespace UI
 {{
