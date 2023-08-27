@@ -19,13 +19,12 @@ namespace FZFUI.Pool
     public class PoolController: IPoolController, IDisposable
     {
         private readonly IInjectViewFactory _injectViewFactory;
-        private readonly PoolContainerMarker _poolContainerMarker;
         private readonly Dictionary<Type, IDisposable> _pools = new();
+        private static PoolContainerMarker PoolContainerMarker => PoolContainerMarker.Instance;
 
-        public PoolController(IInjectViewFactory injectViewFactory, PoolContainerMarker poolContainerMarker)
+        public PoolController(IInjectViewFactory injectViewFactory)
         {
             _injectViewFactory = injectViewFactory;
-            _poolContainerMarker = poolContainerMarker;
         }
 
         public void CreatePool<T>(T prefab) where T: MonoBehaviour
@@ -34,7 +33,7 @@ namespace FZFUI.Pool
             if (_pools.ContainsKey(type))
                 return;
 
-            _pools.Add(type, new GenericPool<T>(prefab, _poolContainerMarker, _injectViewFactory));
+            _pools.Add(type, new GenericPool<T>(prefab, PoolContainerMarker, _injectViewFactory));
         }
 
         public UniTask CreatePoolAsync<T>(T prefab) where T : MonoBehaviour
@@ -57,7 +56,7 @@ namespace FZFUI.Pool
             if (!_pools.ContainsKey(typeof(T)))
                 return;
             var pool = (GenericPool<T>)_pools[typeof(T)];
-            obj.transform.SetParent(_poolContainerMarker.transform);
+            obj.transform.SetParent(PoolContainerMarker.transform);
             pool.Return(obj);
         }
 
