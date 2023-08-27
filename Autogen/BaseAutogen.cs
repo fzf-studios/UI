@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ namespace FZFUI.Autogen
         public GameObject gameObject { get; }
     }
 
-    public class BaseAutogen : MonoBehaviour, IView
+    public class BaseAutogen : MonoBehaviour, IView, IDisposable
     {
 #if UNITY_EDITOR
         [Button("Generate", EButtonEnableMode.Editor)]
@@ -34,7 +35,7 @@ namespace FZFUI.Autogen
 
             usingNames = usingNames.Distinct().ToList();
             var fileName = $"{concreteClass.GetType().Name}Autogen";
-            var code = $@"using UnityEngine;
+            var code = $@"using System;
 {string.Join("\n", usingNames)}
 
 namespace {namespaceName}
@@ -42,6 +43,22 @@ namespace {namespaceName}
     public partial class {concreteClass.GetType().Name}
     {{
         {string.Join("\n\t\t", fields)}
+
+        ///Do not access this field before awake. Throws exception when singleton view attempting to set it twice.
+        public static {concreteClass.GetType().Name} Instance {{get; private set;}}
+
+        protected override void AutoInit()
+        {{
+            if(isSingleton && Instance != null)
+                throw new InvalidOperationException(""Attempt to assign singleton instance field twice."");
+            Instance = this;
+        }}
+
+        public override void Dispose()
+        {{
+            if(Instance == this)
+                Instance = null;
+        }}
     }}
 }}
 ";
@@ -160,11 +177,7 @@ namespace {namespaceName}
 
 namespace UI
 {{
-    public interface I{scriptName}
-    {{
-    
-    }}
-    public partial class {scriptName}: BaseAutogen, I{scriptName}
+    public partial class {scriptName}: BaseAutogen
     {{
 
     }}
@@ -188,5 +201,36 @@ namespace UI
             }
         }
 #endif
+
+        [SerializeField]
+        protected bool isSingleton;
+
+        protected virtual void OnAwake()
+        {
+        }
+
+        protected virtual void AutoInit()
+        {
+        }
+
+        protected virtual void OnDestroyed()
+        {
+        }
+
+        private void Awake()
+        {
+            AutoInit();
+            OnAwake();
+        }
+
+        private void OnDestroy()
+        {
+            Dispose();
+            OnDestroyed();
+        }
+
+        public virtual void Dispose()
+        {
+        }
     }
 }

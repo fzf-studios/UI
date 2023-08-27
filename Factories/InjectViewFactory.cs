@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if USE_ZENJECT
+using UnityEngine;
 using Zenject;
 
 namespace FZFUI.Factories
@@ -23,3 +24,4 @@ namespace FZFUI.Factories
         }
     }
 }
+#endif
