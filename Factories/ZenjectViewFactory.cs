@@ -4,16 +4,11 @@ using Zenject;
 
 namespace FZFUI.Factories
 {
-    public interface IInjectViewFactory
-    {
-        T Create<T>(T prefab, Transform parent) where T : MonoBehaviour;
-    }
-
-    public class InjectViewFactory : IInjectViewFactory
+    public class ZenjectViewFactory : IInjectViewFactory
     {
         private readonly DiContainer _diContainer;
 
-        public InjectViewFactory(DiContainer diContainer)
+        public ZenjectViewFactory(DiContainer diContainer)
         {
             _diContainer = diContainer;
         }

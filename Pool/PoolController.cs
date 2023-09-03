@@ -1,26 +1,20 @@
-﻿#if USE_UNIRX && USE_ZENJECT
+﻿#if USE_UNIRX
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using FZFUI.Factories;
+using FZFUI.Interfaces;
 using FZFUI.Markers;
 using UnityEngine;
 
 namespace FZFUI.Pool
 {
-    public interface IPoolController
-    {
-        void CreatePool<T>(T prefab) where T: MonoBehaviour;
-        UniTask CreatePoolAsync<T>(T prefab) where T: MonoBehaviour;
-        T Rent<T>() where T: MonoBehaviour;
-        void Return<T>(T obj) where T: MonoBehaviour;
-    }
     public class PoolController: IPoolController, IDisposable
     {
         private readonly IInjectViewFactory _injectViewFactory;
         private readonly Dictionary<Type, IDisposable> _pools = new();
-        private static PoolContainerMarker PoolContainerMarker => PoolContainerMarker.Instance;
+        private static Transform PoolContainer => PoolContainerMarker.Transform;
 
         public PoolController(IInjectViewFactory injectViewFactory)
         {
@@ -33,7 +27,7 @@ namespace FZFUI.Pool
             if (_pools.ContainsKey(type))
                 return;
 
-            _pools.Add(type, new GenericPool<T>(prefab, PoolContainerMarker, _injectViewFactory));
+            _pools.Add(type, new InjectPool<T>(prefab, PoolContainer, _injectViewFactory));
         }
 
         public UniTask CreatePoolAsync<T>(T prefab) where T : MonoBehaviour
@@ -46,7 +40,7 @@ namespace FZFUI.Pool
         {
             if (!_pools.ContainsKey(typeof(T)))
                 return null;
-            var pool = (GenericPool<T>)_pools[typeof(T)];
+            var pool = (InjectPool<T>)_pools[typeof(T)];
             
             return pool.Rent();
         }
@@ -55,8 +49,8 @@ namespace FZFUI.Pool
         {
             if (!_pools.ContainsKey(typeof(T)))
                 return;
-            var pool = (GenericPool<T>)_pools[typeof(T)];
-            obj.transform.SetParent(PoolContainerMarker.transform);
+            var pool = (InjectPool<T>)_pools[typeof(T)];
+            obj.transform.SetParent(PoolContainer);
             pool.Return(obj);
         }
 

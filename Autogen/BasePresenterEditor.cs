@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using FZFUI.Buttons;
+using FZFUI.Interfaces;
 using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
 
 namespace FZFUI.Autogen
 {
-    public interface IView
+    public partial class BasePresenter
     {
-        public GameObject gameObject { get; }
-    }
-
-    public class BaseAutogen : MonoBehaviour, IView, IDisposable
-    {
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         [Button("Generate", EButtonEnableMode.Editor)]
         private void GenerateFields()
         {
@@ -30,43 +25,29 @@ namespace FZFUI.Autogen
             RecursivelyGetComponents(transform, components);
 
             var fields = new List<string>();
-            CollectComponents(components, fields, usingNames, (component) => component.gameObject.name);
+            CollectComponents(components, fields, usingNames, (component) => component.gameObject.name.Replace(" ", ""));
             CollectComponents(innerComponents, fields, usingNames, (component) => component.GetType().Name);
 
             usingNames = usingNames.Distinct().ToList();
             var fileName = $"{concreteClass.GetType().Name}Autogen";
-            var code = $@"using System;
-{string.Join("\n", usingNames)}
+            var code = $@"{string.Join("\n", usingNames)}
 
 namespace {namespaceName}
 {{
     public partial class {concreteClass.GetType().Name}
     {{
         {string.Join("\n\t\t", fields)}
-
-        ///Do not access this field before awake. Throws exception when singleton view attempting to set it twice.
-        public static {concreteClass.GetType().Name} Instance {{get; private set;}}
-
-        protected override void AutoInit()
-        {{
-            if(isSingleton && Instance != null)
-                throw new InvalidOperationException(""Attempt to assign singleton instance field twice."");
-            Instance = this;
-        }}
-
-        public override void Dispose()
-        {{
-            if(Instance == this)
-                Instance = null;
-        }}
     }}
 }}
 ";
             var path = $"{Application.dataPath}/{settingsAsset.AutogenScriptsFolderPath}/{fileName}.cs";
             EditorApplication.LockReloadAssemblies();
+            AssetDatabase.StartAssetEditing();
             File.WriteAllText(path, code);
+            AssetDatabase.StopAssetEditing();
             AssetDatabase.Refresh();
             EditorApplication.UnlockReloadAssemblies();
+            AssignFields();
         }
 
         private static AutogenSettings GetAutogenSettings()
@@ -110,10 +91,10 @@ namespace {namespaceName}
                 var component = child
                     .GetComponents<Component>()
                     .FirstOrDefault(x => x.GetType()
-                        .IsSubclassOf(typeof(BaseAutogen)));
+                        .IsSubclassOf(typeof(BasePresenter)));
 
                 component ??= child.GetComponents<Component>()
-                    .FirstOrDefault(x => x is ISubscribableButton);
+                    .FirstOrDefault(x => x is IAutogenPrioritized);
 
                 isAutomaticField = component != null;
 
@@ -157,80 +138,8 @@ namespace {namespaceName}
         private Component GetConcreteClass()
         {
             return gameObject.GetComponents<Component>()
-                .First(x => x.GetType().IsSubclassOf(typeof(BaseAutogen)));
-        }
-
-        [MenuItem("GameObject/Create New UI", false, 10)]
-        private static void CreateScript(MenuCommand menuCommand)
-        {
-            var settingsAsset = GetAutogenSettings();
-            string scriptName = Selection.activeObject.name;
-            var filePath = $"{Application.dataPath}/{settingsAsset.UIScriptsFolderPath}/{scriptName}.cs";
-            if (AssetDatabase.LoadAssetAtPath<MonoScript>(filePath) != null)
-            {
-                Debug.LogWarning($"Attempt to rewrite already existing class file!");
-                return;
-            }
-
-            var baseAutogenType = typeof(BaseAutogen);
-            File.WriteAllText(filePath, $@"using {baseAutogenType.Namespace};
-
-namespace UI
-{{
-    public partial class {scriptName}: BaseAutogen
-    {{
-
-    }}
-}}");
-            AssetDatabase.Refresh();
-            var asset = AssetDatabase.LoadAssetAtPath(filePath, typeof(MonoScript));
-            if (asset == null)
-            {
-                return;
-            }
-
-            var activeGameObject = Selection.activeGameObject;
-
-            if (activeGameObject != null)
-            {
-                var script = asset as MonoScript;
-                if (script == null)
-                    return;
-
-                activeGameObject.AddComponent(script.GetClass());
-            }
+                .First(x => x.GetType().IsSubclassOf(typeof(BasePresenter)));
         }
 #endif
-
-        [SerializeField]
-        protected bool isSingleton;
-
-        protected virtual void OnAwake()
-        {
-        }
-
-        protected virtual void AutoInit()
-        {
-        }
-
-        protected virtual void OnDestroyed()
-        {
-        }
-
-        private void Awake()
-        {
-            AutoInit();
-            OnAwake();
-        }
-
-        private void OnDestroy()
-        {
-            Dispose();
-            OnDestroyed();
-        }
-
-        public virtual void Dispose()
-        {
-        }
     }
 }

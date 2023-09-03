@@ -2,9 +2,8 @@
 
 namespace FZFUI.Markers
 {
-    public class PoolContainerMarker : MonoBehaviour
+    public class PoolContainerMarker : MonoSingleton<PoolContainerMarker>
     {
-        public static PoolContainerMarker Instance { get; private set; }
-        private void Awake() => Instance = this;
+        public static Transform Transform => Instance.transform;
     }
 }
